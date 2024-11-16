@@ -15,5 +15,7 @@ import com.intellect.serverstatuschecker.domain.ServerDetails;
 public interface ServerDetailsRepository extends JpaRepository<ServerDetails, Long> {
 
 	List<ServerDetails> findByServerStatus(Boolean status);
+
+	ServerDetails findByServerIpAddressAndServerPortAndServerStatus(String serverIpAddress, String serverPort, Boolean true1);
 	
 }

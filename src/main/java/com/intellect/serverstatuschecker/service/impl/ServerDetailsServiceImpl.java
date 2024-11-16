@@ -13,6 +13,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +31,7 @@ import com.intellect.serverstatuschecker.repository.ServerDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerMonitorDetailsRepository;
 import com.intellect.serverstatuschecker.repository.UserRepository;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
+import com.intellect.serverstatuschecker.service.dto.LoginDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.UsersDTO;
@@ -65,12 +70,47 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private ServerDetailsMapper serverDetailsMapper;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private JWTServiceImpl jwtServiceImpl;
 
 	@Override
 	public ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
-		// TODO Auto-generated method stub
-		return null;
+		if(null != serverDetailsDTO) {
+			duplicateCheck(serverDetailsDTO);
+			if(null != serverDetailsDTO.getId()) {
+				Optional<ServerDetails> optServerDetails = serverDetailsRepository.findById(serverDetailsDTO.getId());
+				if(optServerDetails.isPresent()) {
+					ServerDetails serverDetails = optServerDetails.get();
+					serverDetailsDTO.setServerIpAddress(serverDetails.getServerIpAddress());
+					serverDetailsDTO.setServerPort(serverDetails.getServerPort());
+					serverDetailsDTO.setServerStatus(ApplicationConstants.TRUE);
+				}
+			}
+			serverDetailsRepository.save(serverDetailsMapper.toEntity(serverDetailsDTO));
+		}
+		return serverDetailsDTO;
 	}
+
+	private void duplicateCheck(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
+		ServerDetails serverDetails = serverDetailsRepository.findByServerIpAddressAndServerPortAndServerStatus(
+				serverDetailsDTO.getServerIpAddress(), serverDetailsDTO.getServerPort(), ApplicationConstants.TRUE);
+
+		if (null != serverDetails && null != serverDetails.getId()) {
+			if (!serverDetails.getId().equals(serverDetailsDTO.getId())) {
+				String errorMessage = String.format(ApplicationConstants.SERVER_DETAILS_ALREADY_EXISTED,
+						serverDetailsDTO.getServerIpAddress(), serverDetailsDTO.getServerPort());
+				throw new ServerDetailsBusinessException(errorMessage);
+			}
+		}
+	}
+
 
 	@Override
 	public List<ServerMonitorDetailsDTO> findAll() throws ServerDetailsBusinessException {
@@ -265,5 +305,34 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		}
 		return usersDTO;
 	}
+
+	@Override
+	public LoginDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException {
+	    try {
+	        // Authenticate the user
+	        Authentication authentication = authenticationManager.authenticate(
+	            new UsernamePasswordAuthenticationToken(loginDTO.getLoginUserName(), loginDTO.getLoginPassword())
+	        );
+
+	        // If authentication is successful
+	        if (authentication.isAuthenticated()) {
+	            // After successful authentication, you may want to create a token
+	            String token = jwtServiceImpl.generateToken(loginDTO.getLoginUserName());  
+
+	            loginDTO.setAuthToken(token);
+	            return loginDTO;  
+	        } else {
+	            throw new ServerDetailsBusinessException(ApplicationConstants.AUTHENTICATION_FAILED);
+	        }
+
+	    } catch (BadCredentialsException e) {
+	        // Handle incorrect credentials
+	        throw new ServerDetailsBusinessException(ApplicationConstants.INVAILD_USERNAME_OR_PASSWORD);
+	    } catch (Exception e) {
+	        // Handle other unexpected errors
+	        throw new ServerDetailsBusinessException(ApplicationConstants.AN_ERROR_OCCURED_DURING_AUTHENTICATION);
+	    }
+	}
+
 
 }

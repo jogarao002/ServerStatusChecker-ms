@@ -48,4 +48,12 @@ public class ApplicationConstants {
 	public static final Integer ONE = Integer.parseInt(prop.getProperty("ONE"));
 	
 	public static final String USER_NAME_NOT_FOUND = prop.getProperty("USER_NAME_NOT_FOUND");
+	
+	public static final String AUTHENTICATION_FAILED = prop.getProperty("AUTHENTICATION_FAILED");
+	
+	public static final String INVAILD_USERNAME_OR_PASSWORD = prop.getProperty("INVAILD_USERNAME_OR_PASSWORD");
+	
+	public static final String AN_ERROR_OCCURED_DURING_AUTHENTICATION = prop.getProperty("AN_ERROR_OCCURED_DURING_AUTHENTICATION");
+	
+	public static final String AUTHICATION_FAILED = prop.getProperty("AUTHICATION_FAILED");
 }
