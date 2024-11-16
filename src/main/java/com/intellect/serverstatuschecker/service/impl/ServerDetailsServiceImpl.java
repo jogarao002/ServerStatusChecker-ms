@@ -13,21 +13,26 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.intellect.serverstatuschecker.domain.MailDetails;
 import com.intellect.serverstatuschecker.domain.ServerDetails;
 import com.intellect.serverstatuschecker.domain.ServerMonitorDetails;
+import com.intellect.serverstatuschecker.domain.Users;
 import com.intellect.serverstatuschecker.exception.ServerDetailsBusinessException;
 import com.intellect.serverstatuschecker.repository.MailDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerMonitorDetailsRepository;
+import com.intellect.serverstatuschecker.repository.UserRepository;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
 import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
+import com.intellect.serverstatuschecker.service.dto.UsersDTO;
 import com.intellect.serverstatuschecker.service.mapper.ServerDetailsMapper;
 import com.intellect.serverstatuschecker.service.mapper.ServerMonitorDetailsMapper;
+import com.intellect.serverstatuschecker.service.mapper.UsersMapper;
 import com.intellect.serverstatuschecker.util.ApplicationConstants;
 import com.intellect.serverstatuschecker.util.EmailUtils;
 
@@ -51,6 +56,15 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 
 	@Autowired
 	private EmailUtils emailUtils;
+	
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	
+	@Autowired
+	private UsersMapper usersMapper;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Override
 	public ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
@@ -240,6 +254,16 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public UsersDTO register(UsersDTO usersDTO) {
+		if(null != usersDTO) {
+			Users users = usersMapper.toEntity(usersDTO);
+			users.setPassword(bCryptPasswordEncoder.encode(users.getPassword()));
+			userRepository.save(users);
+		}
+		return usersDTO;
 	}
 
 }

@@ -46,4 +46,6 @@ public class ApplicationConstants {
 	public static final Boolean FALSE = Boolean.parseBoolean(prop.getProperty("FALSE"));
 	
 	public static final Integer ONE = Integer.parseInt(prop.getProperty("ONE"));
+	
+	public static final String USER_NAME_NOT_FOUND = prop.getProperty("USER_NAME_NOT_FOUND");
 }
