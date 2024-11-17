@@ -56,8 +56,7 @@ public class ServerDetailsResource {
 	}
 	
 	@PostMapping("/register")
-	public ResponseObject createNewUser(@RequestHeader(required = true) Long userid,
-			@RequestHeader(required = true) String authToken, @RequestBody UsersDTO usersDTO){
+	public ResponseObject createNewUser(@RequestBody UsersDTO usersDTO){
 		List<UsersDTO> data = null;
 		UsersDTO result = null;
 		try {
@@ -71,18 +70,17 @@ public class ServerDetailsResource {
 			data.add(result);
 		} catch (ServerDetailsBusinessException e) {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
-					ApplicationConstants.CREATE_RECORD_FAILED + "," + e.getMessage(), data);
+					ApplicationConstants.REGISTER_FAILED + "," + e.getMessage(), data);
 		} catch (Exception e) {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.SERVER_ERROR, null);
 		}
 		return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_SUCCESS,
-				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.CREATE_RECORD_SUCCESS, data);
+				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.REGISTER_SUCCESS, data);
 	}
 	
 	@PostMapping("/login")
-	public ResponseObject createNewUser(@RequestHeader(required = true) Long userid,
-			@RequestHeader(required = true) String authToken, @RequestBody LoginDTO loginDTO){
+	public ResponseObject createNewUser(@RequestBody LoginDTO loginDTO){
 		List<LoginDTO> data = null;
 		LoginDTO result = null;
 		try {
@@ -91,13 +89,13 @@ public class ServerDetailsResource {
 			data.add(result);
 		} catch (ServerDetailsBusinessException e) {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
-					ApplicationConstants.CREATE_RECORD_FAILED + "," + e.getMessage(), data);
+					ApplicationConstants.LOGIN_FAILED + "," + e.getMessage(), data);
 		} catch (Exception e) {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.SERVER_ERROR, null);
 		}
 		return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_SUCCESS,
-				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.CREATE_RECORD_SUCCESS, data);
+				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.LOGIN_SUCCESS, data);
 	}
 	
 	@GetMapping("/get_all")

@@ -56,4 +56,12 @@ public class ApplicationConstants {
 	public static final String AN_ERROR_OCCURED_DURING_AUTHENTICATION = prop.getProperty("AN_ERROR_OCCURED_DURING_AUTHENTICATION");
 	
 	public static final String AUTHICATION_FAILED = prop.getProperty("AUTHICATION_FAILED");
+	
+	public static final String LOGIN_SUCCESS = prop.getProperty("LOGIN_SUCCESS");
+	
+	public static final String LOGIN_FAILED = prop.getProperty("LOGIN_FAILED");
+	
+	public static final String REGISTER_SUCCESS = prop.getProperty("REGISTER_SUCCESS");
+	
+	public static final String REGISTER_FAILED = prop.getProperty("REGISTER_FAILED");
 }

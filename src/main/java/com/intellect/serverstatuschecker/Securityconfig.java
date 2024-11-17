@@ -23,7 +23,6 @@ public class Securityconfig {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
-	
 	@Autowired
     private JwtFilter jwtFilter;
 
@@ -31,7 +30,7 @@ public class Securityconfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	    return http.csrf(customizer -> customizer.disable())
 	            .authorizeHttpRequests(request -> request
-	                    .requestMatchers("/register", "/login")
+	                    .requestMatchers("/server_details/register", "/server_details/login")
 	                    .permitAll()
 	                    .anyRequest().authenticated())
 	            .httpBasic(Customizer.withDefaults())
@@ -39,7 +38,6 @@ public class Securityconfig {
 	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 	            .build();
 	}
-
     
     @Bean
     public AuthenticationProvider authenticationProvider() {
