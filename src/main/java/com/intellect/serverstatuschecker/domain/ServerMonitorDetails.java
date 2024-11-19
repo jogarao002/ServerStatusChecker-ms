@@ -25,21 +25,18 @@ public class ServerMonitorDetails implements Serializable {
     private Long id;
 	
 	@Column(name = "server_date")
-    private LocalDate serverDate;
-	
+	private LocalDate serverDate;
+
 	@Column(name = "server_time")
-    private LocalTime serverTime;
-    
-	@Column(name = "server_name")
-    private String serverName;
+	private LocalTime serverTime;
 
-    @Column(name = "server_protocol_type")
-    private String serverProtocolType;
+	@Column(name = "server_protocol_type")
+	private String serverProtocolType;
 
-    @Column(name = "server_ip_address")
-    private String serverIpAddress;
+	@Column(name = "server_ip_address")
+	private String serverIpAddress;
 
-    @Column(name = "server_port")
+	@Column(name = "server_port")
     private String serverPort;
     
     @Column(name = "server-status")
@@ -50,6 +47,12 @@ public class ServerMonitorDetails implements Serializable {
     
     @Column(name = "inactive_count")
     private Integer inactiveCount;
+    
+    @Column(name = "host_name")
+	private String hostName;
+
+	@Column(name = "service_name")
+	private String serviceName;
 
 	public Long getId() {
 		return id;
@@ -73,14 +76,6 @@ public class ServerMonitorDetails implements Serializable {
 
 	public void setServerDate(LocalDate serverDate) {
 		this.serverDate = serverDate;
-	}
-
-	public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
 	}
 
 	public String getServerProtocolType() {
@@ -135,10 +130,26 @@ public class ServerMonitorDetails implements Serializable {
 		this.inactiveCount = inactiveCount;
 	}
 
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, serverDate, serverIpAddress, serverName, serverPort, serverProtocolType,
-				serverStatusName, serverTime);
+		return Objects.hash(id, serverDate, serverIpAddress, serverPort, serverProtocolType,
+				serverStatusName, serverTime,serviceName,hostName);
 	}
 
 	@Override
@@ -152,8 +163,9 @@ public class ServerMonitorDetails implements Serializable {
 		ServerMonitorDetails other = (ServerMonitorDetails) obj;
 		return Objects.equals(id, other.id) && Objects.equals(serverDate, other.serverDate)
 				&& Objects.equals(serverIpAddress, other.serverIpAddress)
-				&& Objects.equals(serverName, other.serverName) && Objects.equals(serverPort, other.serverPort)
+				&& Objects.equals(serviceName, other.serviceName) && Objects.equals(serverPort, other.serverPort)
 				&& Objects.equals(serverProtocolType, other.serverProtocolType)
+				&& Objects.equals(hostName, other.hostName)
 				&& Objects.equals(serverStatusName, other.serverStatusName)
 				&& Objects.equals(serverTime, other.serverTime);
 	}
@@ -161,9 +173,11 @@ public class ServerMonitorDetails implements Serializable {
 	@Override
 	public String toString() {
 		return "ServerMonitorDetails [id=" + id + ", serverDate=" + serverDate + ", serverTime=" + serverTime
-				+ ", serverName=" + serverName + ", serverProtocolType=" + serverProtocolType + ", serverIpAddress="
-				+ serverIpAddress + ", serverPort=" + serverPort + ", serverStatus=" + serverStatus
-				+ ", serverStatusName=" + serverStatusName + ", inactiveCount=" + inactiveCount + "]";
+				+ ", serverProtocolType=" + serverProtocolType + ", serverIpAddress=" + serverIpAddress
+				+ ", serverPort=" + serverPort + ", serverStatus=" + serverStatus + ", serverStatusName="
+				+ serverStatusName + ", inactiveCount=" + inactiveCount + ", hostName=" + hostName + ", serviceName="
+				+ serviceName + "]";
 	}
+
 
 }

@@ -1,8 +1,8 @@
 package com.intellect.serverstatuschecker.service.dto;
 
 public enum DataSeedingEnum {
-	SERVER_NAME("server_name"), SERVER_PROTOCOL_TYPE("server_protocol_type"), SERVER_IP_ADDRESS("server_ip_address"),
-	SERVER_PORT("server_port"), SERVER_STATUS("server_status"),
+	SERVER_NAME("host_name"), SERVER_PROTOCOL_TYPE("server_protocol_type"), SERVER_IP_ADDRESS("server_ip_address"),
+	SERVER_PORT("server_port"), SERVER_STATUS("server_status"),SERVICE_NAME("service_name"),
 	
 	PERSON_NAME("person_name"), PERSON_MAIL_ID("person_mail_id"), PERSON_PRIORITY("person_priority"),
 	STATUS("status");

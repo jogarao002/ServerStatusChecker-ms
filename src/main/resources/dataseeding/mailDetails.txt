@@ -1,4 +1,7 @@
-person_name:Jogarao#person_mail_id:20335a1201@mvgrce.edu.in#person_priority:1#status:TRUE
-person_name:Praveen#person_mail_id:praveenchowdhary361@gmail.com#person_priority:2#status:TRUE
+person_name:Saikumar#person_mail_id:saikumar.kotturu@intellectinfo.com#person_priority:1#status:TRUE
+person_name:JogaRao#person_mail_id:jogarao.bagadi@intellectinfo.com#person_priority:2#status:TRUE
 person_name:Vivod#person_mail_id:vinod.orirala@intellectinfo.in#person_priority:3#status:FALSE
 person_name:BalaKrishna#person_mail_id:bala@intellectinfo.in#person_priority:4#status:FALSE
+
+
+

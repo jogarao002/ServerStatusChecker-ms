@@ -1,9 +1,21 @@
-server_name:Git#server_protocol_type:http#server_ip_address:192.168.1.220#server_port:9999#server_status:TRUE
-server_name:Insight#server_protocol_type:http#server_ip_address:183.82.113.243#server_port:9078#server_status:TRUE
-server_name:SrikakulamDb#server_protocol_type:https#server_ip_address:103.216.211.87#server_port:9999#server_status:TRUE
-server_name:MatterMost#server_protocol_type:smtp#server_ip_address:192.168.1.225#server_port:8065#server_status:TRUE
-server_name:216_DB#server_protocol_type:database#server_ip_address:192.168.1.216#server_port:3306#server_status:TRUE
-server_name:203_DB#server_protocol_type:database#server_ip_address:192.168.1.203#server_port:3306#server_status:TRUE
-server_name:Jenkins#server_protocol_type:http#server_ip_address:192.168.1.222#server_port:8080#server_status:TRUE
-server_name:Nexus#server_protocol_type:http#server_ip_address:192.168.1.236#server_port:8081#server_status:TRUE
-server_name:248_Sever#server_protocol_type:http#server_ip_address:192.168.1.248#server_port:8079#server_status:TRUE
+host_name:KVKCOR1SO7UVM35#service_name:MatterMost#server_protocol_type:http#server_ip_address:192.168.1.225#server_port:8065#server_status:TRUE
+host_name:KVKCOR1SO1DUVM10#service_name:Java+Tomcat+Navya#server_protocol_type:http#server_ip_address:192.168.1.227#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO1UVM15#service_name:Java17+Tomcat10+ERP Testing#server_protocol_type:http#server_ip_address:192.168.1.220#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO1TUVM12#service_name:MySQL + Navya #server_protocol_type:database#server_ip_address:192.168.1.253#server_port:3306#server_status:TRUE
+host_name:KVKCOR1SO1TUVM13#service_name:Test Environment Db#server_protocol_type:database#server_ip_address:192.168.1.228#server_port:3306#server_status:TRUE
+host_name:KVKCOR1SO1TUVM13#service_name:Test Environment Server #server_protocol_type:http#server_ip_address:192.168.1.228#server_port:8080#server_status:TRUE
+
+host_name:KVKCOR1SO6wvm32#service_name:Jenkins #server_protocol_type:http#server_ip_address:192.168.1.222#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO6DUVM17#service_name:Dev-Java-8 + Tomcat 8.5 #server_protocol_type:http#server_ip_address:192.168.1.233#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO6UVM22#service_name:Tomcat + JK#server_protocol_type:http#server_ip_address:192.168.1.238#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO6DUVM25#service_name:SonarQube #server_protocol_type:http#server_ip_address:192.168.1.201#server_port:9000#server_status:TRUE
+host_name:KVKCOR1SO6TVM29#service_name:Tomcat + Test Environment #server_protocol_type:http#server_ip_address:192.168.1.248#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO6WVM33#service_name:Jenkins226_Java8 #server_protocol_type:http#server_ip_address:192.168.1.226#server_port:8080#server_status:TRUE
+host_name:KVKCOR1SO6DUVM20#service_name:Nexus #server_protocol_type:http#server_ip_address:192.168.1.236#server_port:8081#server_status:TRUE
+host_name:KVKCOR1SO7UVM40#service_name:MySQL + replacement_of_203 #server_protocol_type:database#server_ip_address:192.168.1.216#server_port:3306#server_status:TRUE
+
+
+
+
+
+

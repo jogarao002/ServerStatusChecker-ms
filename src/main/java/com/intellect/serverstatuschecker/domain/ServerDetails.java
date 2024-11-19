@@ -19,9 +19,12 @@ public class ServerDetails implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "server_name")
-    private String serverName;
+    @Column(name = "host_name")
+    private String hostName;
 
+    @Column(name = "service_name")
+    private String serviceName;
+    
     @Column(name = "server_protocol_type")
     private String serverProtocolType;
 
@@ -33,6 +36,10 @@ public class ServerDetails implements Serializable {
 
     @Column(name = "server_status")
     private Boolean serverStatus;
+    
+    
+    
+    
 
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -43,14 +50,6 @@ public class ServerDetails implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
 	}
 
 	public String getServerProtocolType() {
@@ -85,13 +84,30 @@ public class ServerDetails implements Serializable {
 		this.serverStatus = serverStatus;
 	}
 
+	
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, serverIpAddress, serverName, serverPort, serverProtocolType, serverStatus);
+		return Objects.hash(id, serverIpAddress, hostName, serverPort, serverProtocolType, serverStatus,serviceName);
 	}
 
 	@Override
@@ -104,16 +120,17 @@ public class ServerDetails implements Serializable {
 			return false;
 		ServerDetails other = (ServerDetails) obj;
 		return Objects.equals(id, other.id) && Objects.equals(serverIpAddress, other.serverIpAddress)
-				&& Objects.equals(serverName, other.serverName) && Objects.equals(serverPort, other.serverPort)
+				&& Objects.equals(hostName, other.hostName) && Objects.equals(serverPort, other.serverPort)
 				&& Objects.equals(serverProtocolType, other.serverProtocolType)
+				&& Objects.equals(serviceName, other.serviceName)
 				&& Objects.equals(serverStatus, other.serverStatus);
 	}
 
 	@Override
 	public String toString() {
-		return "ServerDetails [id=" + id + ", serverName=" + serverName + ", serverProtocolType=" + serverProtocolType
+		return "ServerDetails [id=" + id + ", hostName=" + hostName + ", serverProtocolType=" + serverProtocolType
 				+ ", serverIpAddress=" + serverIpAddress + ", serverPort=" + serverPort + ", serverStatus="
-				+ serverStatus + "]";
+				+ serverStatus + ", serviceName=" + serviceName + "]";
 	}
 
 }

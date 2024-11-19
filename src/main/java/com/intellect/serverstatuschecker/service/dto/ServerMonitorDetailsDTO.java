@@ -20,7 +20,7 @@ public class ServerMonitorDetailsDTO implements Serializable {
 	
     private LocalTime serverTime;
     
-    private String serverName;
+    private String serviceName;
 
     private String serverProtocolType;
 
@@ -33,7 +33,9 @@ public class ServerMonitorDetailsDTO implements Serializable {
     private String serverStatusName;
     
     private Integer inactiveCount;
-
+    
+    private String hostName;
+    
 	public Long getId() {
 		return id;
 	}
@@ -58,13 +60,6 @@ public class ServerMonitorDetailsDTO implements Serializable {
 		this.serverTime = serverTime;
 	}
 
-	public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
-	}
 
 	public String getServerProtocolType() {
 		return serverProtocolType;
@@ -114,14 +109,31 @@ public class ServerMonitorDetailsDTO implements Serializable {
 		this.inactiveCount = inactiveCount;
 	}
 
+	
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, inactiveCount, serverDate, serverIpAddress, serverName, serverPort, serverProtocolType,
-				serverStatus, serverStatusName, serverTime);
+		return Objects.hash(id, inactiveCount, serverDate, serverIpAddress, serviceName, serverPort, serverProtocolType,
+				serverStatus, serverStatusName, serverTime,hostName);
 	}
 
 	@Override
@@ -136,19 +148,22 @@ public class ServerMonitorDetailsDTO implements Serializable {
 		return Objects.equals(id, other.id) && Objects.equals(inactiveCount, other.inactiveCount)
 				&& Objects.equals(serverDate, other.serverDate)
 				&& Objects.equals(serverIpAddress, other.serverIpAddress)
-				&& Objects.equals(serverName, other.serverName) && Objects.equals(serverPort, other.serverPort)
+				&& Objects.equals(serviceName, other.serviceName) && Objects.equals(serverPort, other.serverPort)
 				&& Objects.equals(serverProtocolType, other.serverProtocolType)
 				&& Objects.equals(serverStatus, other.serverStatus)
 				&& Objects.equals(serverStatusName, other.serverStatusName)
+				&& Objects.equals(hostName, other.hostName)
 				&& Objects.equals(serverTime, other.serverTime);
 	}
 
 	@Override
 	public String toString() {
 		return "ServerMonitorDetailsDTO [id=" + id + ", serverDate=" + serverDate + ", serverTime=" + serverTime
-				+ ", serverName=" + serverName + ", serverProtocolType=" + serverProtocolType + ", serverIpAddress="
+				+ ", serviceName=" + serviceName + ", serverProtocolType=" + serverProtocolType + ", serverIpAddress="
 				+ serverIpAddress + ", serverPort=" + serverPort + ", serverStatus=" + serverStatus
-				+ ", serverStatusName=" + serverStatusName + ", inactiveCount=" + inactiveCount + "]";
+				+ ", serverStatusName=" + serverStatusName + ", inactiveCount=" + inactiveCount + ", hostName="
+				+ hostName + "]";
 	}
+
     
 }

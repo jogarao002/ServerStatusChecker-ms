@@ -118,7 +118,8 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-	@Scheduled(cron = "0 0/15 * * * ?")
+	//@Scheduled(cron = "0 0/15 * * * ?")
+	  @Scheduled(cron = "0 */1 * * * *")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
@@ -195,10 +196,11 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 				serverMonitorDetails = new ServerMonitorDetails();
 				serverMonitorDetails.setServerDate(LocalDate.now());
 				serverMonitorDetails.setServerTime(localTime);
-				serverMonitorDetails.setServerName(serverDetails.getServerName());
+				serverMonitorDetails.setHostName(serverDetails.getHostName());
 				serverMonitorDetails.setServerProtocolType(serverDetails.getServerProtocolType());
 				serverMonitorDetails.setServerIpAddress(serverDetails.getServerIpAddress());
 				serverMonitorDetails.setServerPort(serverDetails.getServerPort());
+				serverMonitorDetails.setServiceName(serverDetails.getServiceName());
 			}
 
 			serverMonitorDetails.setServerStatus(serverReachableStatus);
@@ -256,7 +258,8 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		body.append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
 		body.append("<thead>");
 		body.append("<tr>");
-		body.append("<th>Server Name</th>");
+		body.append("<th> host Name</th>");
+		body.append("<th>Service Name</th>");
 		body.append("<th>Server Ip Address</th>");
 		body.append("<th>Server Port</th>");
 		body.append("<th>Server Status</th>");
@@ -265,7 +268,8 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		body.append("<tbody>");
 		for (ServerMonitorDetails server : serverMonitorDetailsList) {
 			body.append("<tr>");
-			body.append("<td>").append(server.getServerName()).append("</td>");
+			body.append("<td>").append(server.getHostName()).append("</td>");
+			body.append("<td>").append(server.getServiceName()).append("</td>");
 			body.append("<td>").append(server.getServerIpAddress()).append("</td>");
 			body.append("<td>").append(server.getServerPort()).append("</td>");
 			body.append("<td>").append(server.getServerStatusName()).append("</td>");

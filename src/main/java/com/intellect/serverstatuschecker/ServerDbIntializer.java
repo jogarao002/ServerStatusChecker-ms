@@ -52,8 +52,11 @@ public class ServerDbIntializer implements ApplicationRunner {
 					if (withFieldName != null) {
 						if (null != withFieldName[0].trim() && (withFieldName[0].trim())
 								.equalsIgnoreCase(DataSeedingEnum.SERVER_NAME.getColumnName())) {
-							serverDetails.setServerName(withFieldName[1].trim());
-						} else if (null != withFieldName[0].trim() && (withFieldName[0].trim())
+							serverDetails.setHostName(withFieldName[1].trim());
+						}else if (null != withFieldName[0].trim() && (withFieldName[0].trim())
+								.equalsIgnoreCase(DataSeedingEnum.SERVICE_NAME.getColumnName())) {
+							serverDetails.setServiceName(withFieldName[1].trim());
+						}else if (null != withFieldName[0].trim() && (withFieldName[0].trim())
 								.equalsIgnoreCase(DataSeedingEnum.SERVER_PROTOCOL_TYPE.getColumnName())) {
 							serverDetails.setServerProtocolType(withFieldName[1].trim());
 						} else if (null != withFieldName[0].trim() && (withFieldName[0].trim())

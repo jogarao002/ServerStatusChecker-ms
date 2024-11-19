@@ -9,7 +9,7 @@ public class ServerDetailsDTO implements Serializable {
 
 	private Long id;
 
-	private String serverName;
+	private String hostName;
 
 	private String serverProtocolType;
 
@@ -18,6 +18,8 @@ public class ServerDetailsDTO implements Serializable {
 	private String serverPort;
 
 	private Boolean serverStatus;
+	
+	private String serviceName;
 
 	public Long getId() {
 		return id;
@@ -25,14 +27,6 @@ public class ServerDetailsDTO implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
 	}
 
 	public String getServerProtocolType() {
@@ -67,13 +61,30 @@ public class ServerDetailsDTO implements Serializable {
 		this.serverStatus = serverStatus;
 	}
 
+	
+	public String getHostName() {
+		return hostName;
+	}
+
+	public void setHostName(String hostName) {
+		this.hostName = hostName;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, serverIpAddress, serverName, serverPort, serverProtocolType, serverStatus);
+		return Objects.hash(id, serverIpAddress, hostName, serverPort, serverProtocolType, serverStatus,serviceName);
 	}
 
 	@Override
@@ -86,16 +97,17 @@ public class ServerDetailsDTO implements Serializable {
 			return false;
 		ServerDetailsDTO other = (ServerDetailsDTO) obj;
 		return Objects.equals(id, other.id) && Objects.equals(serverIpAddress, other.serverIpAddress)
-				&& Objects.equals(serverName, other.serverName) && Objects.equals(serverPort, other.serverPort)
+				&& Objects.equals(hostName, other.hostName) && Objects.equals(serverPort, other.serverPort)
 				&& Objects.equals(serverProtocolType, other.serverProtocolType)
+				&& Objects.equals(serviceName, other.serviceName)
 				&& Objects.equals(serverStatus, other.serverStatus);
 	}
 
 	@Override
 	public String toString() {
-		return "ServerDetailsDTO [id=" + id + ", serverName=" + serverName + ", serverProtocolType="
-				+ serverProtocolType + ", serverIpAddress=" + serverIpAddress + ", serverPort=" + serverPort
-				+ ", serverStatus=" + serverStatus + "]";
+		return "ServerDetailsDTO [id=" + id + ", hostName=" + hostName + ", serverProtocolType=" + serverProtocolType
+				+ ", serverIpAddress=" + serverIpAddress + ", serverPort=" + serverPort + ", serverStatus="
+				+ serverStatus + ", serviceName=" + serviceName + "]";
 	}
-	
+
 }
