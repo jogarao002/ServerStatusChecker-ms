@@ -119,7 +119,6 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	}
 
 	//@Scheduled(cron = "0 0/15 * * * ?")
-	  @Scheduled(cron = "0 */1 * * * *")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {

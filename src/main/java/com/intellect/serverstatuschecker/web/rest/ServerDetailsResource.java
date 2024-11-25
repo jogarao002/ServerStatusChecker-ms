@@ -31,8 +31,7 @@ public class ServerDetailsResource {
 	private ServerDetailsService serverDetailsService;
 	
 	@PostMapping("/add")
-	public ResponseObject createNewServer(@RequestHeader(required = true) Long userid,
-			@RequestHeader(required = true) String authToken, @RequestBody ServerDetailsDTO serverDetailsDTO){
+	public ResponseObject createNewServer(@RequestBody ServerDetailsDTO serverDetailsDTO){
 		List<ServerDetailsDTO> data = null;
 		ServerDetailsDTO result = null;
 		try {
@@ -99,8 +98,7 @@ public class ServerDetailsResource {
 	}
 	
 	@GetMapping("/get_all")
-	public ResponseObject getAllServers(@RequestHeader(required = true) Long userid,
-			@RequestHeader(required = true) String authToken) {
+	public ResponseObject getAllServers() {
 		List<ServerMonitorDetailsDTO> result = null;
 		try {
 			System.out.println(".....");
