@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intellect.serverstatuschecker.exception.ServerDetailsBusinessException;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
+import com.intellect.serverstatuschecker.service.dto.LogInDataDTO;
 import com.intellect.serverstatuschecker.service.dto.LoginDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
@@ -80,8 +80,8 @@ public class ServerDetailsResource {
 	
 	@PostMapping("/login")
 	public ResponseObject createNewUser(@RequestBody LoginDTO loginDTO){
-		List<LoginDTO> data = null;
-		LoginDTO result = null;
+		List<LogInDataDTO> data = null;
+		LogInDataDTO result = null;
 		try {
 			result = serverDetailsService.login(loginDTO);
 			data = new ArrayList<>();

@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +30,7 @@ import com.intellect.serverstatuschecker.repository.ServerDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerMonitorDetailsRepository;
 import com.intellect.serverstatuschecker.repository.UserRepository;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
+import com.intellect.serverstatuschecker.service.dto.LogInDataDTO;
 import com.intellect.serverstatuschecker.service.dto.LoginDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
@@ -310,7 +310,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	}
 
 	@Override
-	public LoginDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException {
+	public LogInDataDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException {
 	    try {
 	        // Authenticate the user
 	        Authentication authentication = authenticationManager.authenticate(
@@ -321,9 +321,13 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	        if (authentication.isAuthenticated()) {
 	            // After successful authentication, you may want to create a token
 	            String token = jwtServiceImpl.generateToken(loginDTO.getLoginUserName());  
-
-	            loginDTO.setAuthToken(token);
-	            return loginDTO;  
+	            LogInDataDTO logInDataDTO = new LogInDataDTO();
+	            logInDataDTO.setUserName(loginDTO.getLoginUserName());
+	            logInDataDTO.setToken(token);
+	            Users user = userRepository.findByUserName(loginDTO.getLoginUserName());
+	            logInDataDTO.setUserRole(user.getUserRole());
+	            
+	            return logInDataDTO;
 	        } else {
 	            throw new ServerDetailsBusinessException(ApplicationConstants.AUTHENTICATION_FAILED);
 	        }

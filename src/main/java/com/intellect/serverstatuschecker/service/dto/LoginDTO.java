@@ -14,7 +14,6 @@ public class LoginDTO implements Serializable {
 	
 	private String loginPassword;
 	
-	private String authToken;
 
 	public String getLoginUserName() {
 		return loginUserName;
@@ -36,14 +35,6 @@ public class LoginDTO implements Serializable {
 		return serialVersionUID;
 	}
 
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(loginPassword, loginUserName);
@@ -63,8 +54,7 @@ public class LoginDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "LoginDTO [loginUserName=" + loginUserName + ", loginPassword=" + loginPassword + ", authToken="
-				+ authToken + "]";
+		return "LoginDTO [loginUserName=" + loginUserName + ", loginPassword=" + loginPassword + "]";
 	}
 
 }

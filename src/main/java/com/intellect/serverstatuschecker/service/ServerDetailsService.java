@@ -3,6 +3,7 @@ package com.intellect.serverstatuschecker.service;
 import java.util.List;
 
 import com.intellect.serverstatuschecker.exception.ServerDetailsBusinessException;
+import com.intellect.serverstatuschecker.service.dto.LogInDataDTO;
 import com.intellect.serverstatuschecker.service.dto.LoginDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
@@ -23,7 +24,7 @@ public interface ServerDetailsService {
 
 	UsersDTO register(UsersDTO userDTO) throws ServerDetailsBusinessException;
 
-	LoginDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException;
+	LogInDataDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException;
 
 	
 }
