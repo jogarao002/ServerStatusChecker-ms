@@ -26,5 +26,7 @@ public interface ServerDetailsService {
 
 	LogInDataDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException;
 
+	void delete() throws ServerDetailsBusinessException;
+
 	
 }

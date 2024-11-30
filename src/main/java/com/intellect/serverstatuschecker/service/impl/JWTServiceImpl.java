@@ -1,20 +1,23 @@
 package com.intellect.serverstatuschecker.service.impl;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JWTServiceImpl {
@@ -34,11 +37,21 @@ public class JWTServiceImpl {
 
 	public String generateToken(String username) {
 		Map<String, Object> claims = new HashMap<>();
-		return Jwts.builder().claims().add(claims).subject(username).issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000)).and().signWith(getKey()).compact(); // Set expiration to 1 hour
+		return Jwts.builder().claims().add(claims).subject(username).issuedAt(new Date(System.currentTimeMillis())) // 2 * 60 * 5000 for 5 minutes
+				.expiration(new Date(System.currentTimeMillis() + 60 * 60 * 1000)).and().signWith(getKey()).compact(); // Set expiration to 1 hour // 60 * 60 * 1000
 
 	}
+	
+	public String generateExpirationToken() {
+        Date expirationDate = new Date(System.currentTimeMillis() + 60 * 60 * 1000); // Set expiration to 5 minutes
 
+        return Jwts.builder()
+                .claims(new HashMap<>())  
+                .expiration(expirationDate)
+                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+	
 	private SecretKey getKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(secretkey);
 		return Keys.hmacShaKeyFor(keyBytes);

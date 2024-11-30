@@ -64,4 +64,6 @@ public class ApplicationConstants {
 	public static final String REGISTER_SUCCESS = prop.getProperty("REGISTER_SUCCESS");
 	
 	public static final String REGISTER_FAILED = prop.getProperty("REGISTER_FAILED");
+	
+	public static final String DELETED_SUCCESSFULLY = prop.getProperty("DELETED_SUCCESSFULLY");
 }

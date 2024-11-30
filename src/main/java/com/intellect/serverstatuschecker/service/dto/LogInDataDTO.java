@@ -12,6 +12,8 @@ public class LogInDataDTO implements Serializable {
 	private String userRole;
 	
 	private String token;
+	
+	private String expirationToken;
 
 	public String getUserName() {
 		return userName;
@@ -41,6 +43,14 @@ public class LogInDataDTO implements Serializable {
 		return serialVersionUID;
 	}
 
+	public String getExpirationToken() {
+		return expirationToken;
+	}
+
+	public void setExpirationToken(String expirationToken) {
+		this.expirationToken = expirationToken;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(token, userName, userRole);
@@ -61,7 +71,8 @@ public class LogInDataDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "LogInDataDTO [userName=" + userName + ", userRole=" + userRole + ", token=" + token + "]";
+		return "LogInDataDTO [userName=" + userName + ", userRole=" + userRole + ", token=" + token
+				+ ", expirationToken=" + expirationToken + "]";
 	}
-	
+
 }

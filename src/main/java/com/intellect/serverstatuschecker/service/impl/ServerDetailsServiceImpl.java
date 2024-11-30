@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -118,7 +119,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-	//@Scheduled(cron = "0 0/15 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
@@ -326,6 +327,8 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	            logInDataDTO.setToken(token);
 	            Users user = userRepository.findByUserName(loginDTO.getLoginUserName());
 	            logInDataDTO.setUserRole(user.getUserRole());
+	            String expirationToken = jwtServiceImpl.generateExpirationToken();
+	            logInDataDTO.setExpirationToken(expirationToken);
 	            
 	            return logInDataDTO;
 	        } else {
@@ -339,6 +342,11 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	        // Handle other unexpected errors
 	        throw new ServerDetailsBusinessException(ApplicationConstants.AN_ERROR_OCCURED_DURING_AUTHENTICATION);
 	    }
+	}
+
+	@Override
+	public void delete() throws ServerDetailsBusinessException {
+		
 	}
 
 
