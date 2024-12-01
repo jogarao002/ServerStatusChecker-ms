@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -108,7 +108,6 @@ public class ServerDetailsResource {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.FETCH_RECORD_FAILED, result);
 		} catch (Exception e) {
-			System.out.println(".....");
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.SERVER_ERROR, null);
 		}
@@ -117,21 +116,20 @@ public class ServerDetailsResource {
 
 	}
 	
-	@DeleteMapping("/remove")
-	public ResponseObject deleteServer(Long id) {
+	@DeleteMapping("/remove/{id}")
+	public ResponseObject deleteServer(@PathVariable Long id) {
 		List<ServerMonitorDetailsDTO> result = null;
 		try {
-			serverDetailsService.delete();
+			result = serverDetailsService.delete(id);
 		} catch (ServerDetailsBusinessException e) {
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.FETCH_RECORD_FAILED, result);
 		} catch (Exception e) {
-			System.out.println(".....");
 			return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_ERROR,
 					ApplicationConstants.SERVER_ERROR, null);
 		}
 		return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_SUCCESS,
-				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.DELETED_SUCCESSFULLY, null);
+				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.DELETED_SUCCESSFULLY, result);
 
 	}
 }

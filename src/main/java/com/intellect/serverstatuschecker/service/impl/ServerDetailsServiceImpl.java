@@ -152,7 +152,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 						ApplicationConstants.TRUE);
 				if (null != mailDetails && null != mailDetails.getPersonMailAddress()) {
 					firstPriorityMailId.add(mailDetails.getPersonMailAddress());
-					firstPriorityPersonName.add(mailDetails.getPersonName());
+					firstPriorityPersonName.add(mailDetails.getPersonName()); 
 				}
 			}
 			if (!firstPriorityMailId.isEmpty()) {
@@ -343,11 +343,27 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	        throw new ServerDetailsBusinessException(ApplicationConstants.AN_ERROR_OCCURED_DURING_AUTHENTICATION);
 	    }
 	}
-
+	
 	@Override
-	public void delete() throws ServerDetailsBusinessException {
-		
+	public List<ServerMonitorDetailsDTO> delete(Long id) throws ServerDetailsBusinessException {
+	    List<ServerMonitorDetailsDTO> serverMonitorDetailsDTOList = new ArrayList<>();
+	    if (id != null) {
+	        Optional<ServerDetails> optServerDetails = serverDetailsRepository.findById(id);
+	        if (optServerDetails.isPresent()) {
+	            ServerDetails serverDetails = optServerDetails.get();
+	            serverDetails.setServerStatus(ApplicationConstants.FALSE);
+	            serverDetailsRepository.save(serverDetails);
+	        }
+	        Optional<ServerMonitorDetails> optServerMonitorDetails = serverMonitorDetailsRepository.findById(id);
+	        if(optServerMonitorDetails.isPresent()) {
+	        	ServerMonitorDetails serverMonitorDetails = optServerMonitorDetails.get();
+	        	serverMonitorDetailsRepository.delete(serverMonitorDetails);
+	        }
+	        serverMonitorDetailsDTOList = findAll();
+	    }
+	    return serverMonitorDetailsDTOList;
 	}
+
 
 
 }
