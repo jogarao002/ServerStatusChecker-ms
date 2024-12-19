@@ -11,27 +11,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        // Allow CORS globally
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200") // Frontend address
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true); // Allow cookies and credentials to be sent
-    }
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**").allowedOrigins("http://localhost:4200", "http://localhost:8086") // Frontend and
+																									// Swagger UI
+				.allowedMethods("*").allowedHeaders("*").allowCredentials(true);
+	}
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowCredentials(true);
-        corsConfig.addAllowedOrigin("http://localhost:4200");  // Allow your frontend origin
-        corsConfig.addAllowedHeader("*"); // Allow all headers
-        corsConfig.addAllowedMethod("*"); // Allow all methods (GET, POST, PUT, DELETE)
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);  // Apply the CORS configuration globally
-
-        return source;
-    }
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.addAllowedOrigin("http://localhost:4200"); // Angular frontend
+		configuration.addAllowedOrigin("http://localhost:8086"); // Swagger UI
+		configuration.addAllowedMethod("*");
+		configuration.addAllowedHeader("*");
+		configuration.setAllowCredentials(true);
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 }
