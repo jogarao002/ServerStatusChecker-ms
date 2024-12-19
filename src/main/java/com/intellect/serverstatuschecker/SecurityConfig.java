@@ -19,41 +19,39 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private UserDetailsService userDetailsService; // This is used to load user details from DB
+	@Autowired
+	private UserDetailsService userDetailsService; // Load user details from the database
 
-    @Autowired
-    private JwtFilter jwtFilter; // Your custom JWT filter to verify JWT tokens
+	@Autowired
+	private JwtFilter jwtFilter; // Custom JWT filter to validate tokens
 
-    // Configure the security filter chain
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()  // Disable CSRF protection as we are using JWT (stateless)
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/server_details/register", "/server_details/login") // Open endpoints that don't need authentication
-                        .permitAll()
-                        .anyRequest().authenticated() // Protect all other endpoints
-                )
-                .httpBasic().disable() // Basic Authentication (can be replaced with JWT authentication)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless (no sessions)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter before default UsernamePasswordAuthenticationFilter
-                .cors() // Enable CORS (for cross-origin requests)
-                .and()
-                .build(); // Build the configuration
-    }
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		return http.csrf().disable()
+				.authorizeHttpRequests(
+						request -> request.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger
+																											// endpoints
+								.requestMatchers("/server_details/register", "/server_details/login").permitAll() // Public
+																													// endpoints
+								.anyRequest().authenticated() // Protect other endpoints
+				).httpBasic().disable()
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless
+																												// session
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Add JWT filter
+				.cors().and().build();
+	}
 
-    // Define the AuthenticationProvider for Spring Security to authenticate users from your DB
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // Password encoder (BCrypt)
-        provider.setUserDetailsService(userDetailsService); // Set the UserDetailsService to load users
-        return provider;
-    }
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setPasswordEncoder(new BCryptPasswordEncoder(12)); // Use BCrypt for password hashing
+		provider.setUserDetailsService(userDetailsService); // Use custom UserDetailsService
+		return provider;
+	}
 
-    // Define the AuthenticationManager bean to be used for authentication
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager(); // Automatically get the AuthenticationManager
-    }
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
 }
