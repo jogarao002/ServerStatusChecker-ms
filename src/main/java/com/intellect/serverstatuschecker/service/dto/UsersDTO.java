@@ -9,13 +9,11 @@ public class UsersDTO implements Serializable {
 
 	private Long id;
 	
-	private String userSurname;
-	
 	private String userFirstName;
 	
 	private String userLastName;
 	
-	private String userName;
+	private String email;
 	
 	private String password;
 	
@@ -27,14 +25,6 @@ public class UsersDTO implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getUserSurname() {
-		return userSurname;
-	}
-
-	public void setUserSurname(String userSurname) {
-		this.userSurname = userSurname;
 	}
 
 	public String getUserFirstName() {
@@ -51,14 +41,6 @@ public class UsersDTO implements Serializable {
 
 	public void setUserLastName(String userLastName) {
 		this.userLastName = userLastName;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	public String getPassword() {
@@ -80,32 +62,19 @@ public class UsersDTO implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, password, userFirstName, userLastName, userName, userRole, userSurname);
+	
+	public String getEmail() {
+		return email;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UsersDTO other = (UsersDTO) obj;
-		return Objects.equals(id, other.id) && Objects.equals(password, other.password)
-				&& Objects.equals(userFirstName, other.userFirstName)
-				&& Objects.equals(userLastName, other.userLastName) && Objects.equals(userName, other.userName)
-				&& Objects.equals(userRole, other.userRole) && Objects.equals(userSurname, other.userSurname);
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
 	public String toString() {
-		return "UsersDTO [id=" + id + ", userSurname=" + userSurname + ", userFirstName=" + userFirstName
-				+ ", userLastName=" + userLastName + ", userName=" + userName + ", password=" + password + ", userRole="
-				+ userRole + "]";
+		return "UsersDTO [id=" + id + ", userFirstName=" + userFirstName + ", userLastName=" + userLastName + ", email="
+				+ email + ", password=" + password + ", userRole=" + userRole + "]";
 	}
-	
+
 }

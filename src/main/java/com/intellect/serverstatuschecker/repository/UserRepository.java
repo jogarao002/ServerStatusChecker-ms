@@ -6,6 +6,6 @@ import com.intellect.serverstatuschecker.domain.Users;
 
 public interface UserRepository extends JpaRepository<Users, Long> {
 
-	Users findByUserName(String username);
+	Users findByEmail(String username);
 
 }

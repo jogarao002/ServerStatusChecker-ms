@@ -25,17 +25,14 @@ public class Users implements Serializable{
     @Column(name = "id") 
 	private Long id;
 	
-	@Column(name = "user_surname")
-	private String userSurname;
-	
 	@Column(name = "user_first_name")
 	private String userFirstName;
 	
 	@Column(name = "user_last_name")
 	private String userLastName;
 	
-	@Column(name = "user_name")
-	private String userName;
+	@Column(name = "email")
+	private String email;
 	
 	@Column(name = "password")
 	private String password;
@@ -51,14 +48,6 @@ public class Users implements Serializable{
 		this.id = id;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -69,14 +58,6 @@ public class Users implements Serializable{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
-	}
-
-	public String getUserSurname() {
-		return userSurname;
-	}
-
-	public void setUserSurname(String userSurname) {
-		this.userSurname = userSurname;
 	}
 
 	public String getUserFirstName() {
@@ -103,29 +84,18 @@ public class Users implements Serializable{
 		this.userRole = userRole;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, password, userName);
+	public String getEmail() {
+		return email;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Users other = (Users) obj;
-		return Objects.equals(id, other.id) && Objects.equals(password, other.password)
-				&& Objects.equals(userName, other.userName);
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
 	public String toString() {
-		return "Users [id=" + id + ", userSurname=" + userSurname + ", userFirstName=" + userFirstName
-				+ ", userLastName=" + userLastName + ", userName=" + userName + ", password=" + password + ", userRole="
-				+ userRole + "]";
+		return "Users [id=" + id + ", userFirstName=" + userFirstName + ", userLastName=" + userLastName + ", email="
+				+ email + ", password=" + password + ", userRole=" + userRole + "]";
 	}
 
 }

@@ -119,7 +119,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-	//@Scheduled(cron = "0 0/1 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
@@ -325,7 +325,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	            LogInDataDTO logInDataDTO = new LogInDataDTO();
 	            logInDataDTO.setUserName(loginDTO.getLoginUserName());
 	            logInDataDTO.setToken(token);
-	            Users user = userRepository.findByUserName(loginDTO.getLoginUserName());
+	            Users user = userRepository.findByEmail(loginDTO.getLoginUserName());
 	            logInDataDTO.setUserRole(user.getUserRole());
 	            String expirationToken = jwtServiceImpl.generateExpirationToken();
 	            logInDataDTO.setExpirationToken(expirationToken);
