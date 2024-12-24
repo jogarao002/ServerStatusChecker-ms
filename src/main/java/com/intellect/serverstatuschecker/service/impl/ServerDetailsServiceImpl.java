@@ -23,11 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.intellect.serverstatuschecker.domain.MailDetails;
 import com.intellect.serverstatuschecker.domain.ServerDetails;
+import com.intellect.serverstatuschecker.domain.ServerHistoryDetails;
 import com.intellect.serverstatuschecker.domain.ServerMonitorDetails;
 import com.intellect.serverstatuschecker.domain.Users;
 import com.intellect.serverstatuschecker.exception.ServerDetailsBusinessException;
 import com.intellect.serverstatuschecker.repository.MailDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerDetailsRepository;
+import com.intellect.serverstatuschecker.repository.ServerHistoryDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerMonitorDetailsRepository;
 import com.intellect.serverstatuschecker.repository.UserRepository;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
@@ -80,6 +82,9 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	
 	@Autowired
 	private JWTServiceImpl jwtServiceImpl;
+	
+	@Autowired
+	private ServerHistoryDetailsRepository serverHistoryDetailsRepository;
 
 	@Override
 	public ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
@@ -119,7 +124,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-//	@Scheduled(cron = "0 0/1 * * * ?")
+	//@Scheduled(cron = "0 0/1 * * * ?")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
@@ -218,7 +223,20 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 					serverMonitorDetails.setInactiveCount(1);
 				}
 			}
-			serverMonitorDetailsRepository.save(serverMonitorDetails);
+			ServerMonitorDetails monitor = serverMonitorDetailsRepository.save(serverMonitorDetails);
+			ServerHistoryDetails history = new ServerHistoryDetails();
+			history.setHostName(monitor.getHostName());
+			history.setServerProtocolType(monitor.getServerProtocolType());
+			history.setServerIpAddress(monitor.getServerIpAddress());
+			history.setServerPort(monitor.getServerPort());
+			history.setServiceName(monitor.getServiceName());
+			history.setServerDate(monitor.getServerDate());
+			history.setServerTime(monitor.getServerTime());
+			history.setServerStatus(monitor.getServerStatus());
+			history.setServerStatusName(monitor.getServerStatusName());
+			
+			serverHistoryDetailsRepository.save(history);
+			
 		}
 	}
 
@@ -364,6 +382,11 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	    return serverMonitorDetailsDTOList;
 	}
 
+	//@Scheduled(cron = "59 23 28 1-12 *")
+	public void deleteHistoryDetails() {
+		serverHistoryDetailsRepository.deleteAll();
+		
+	}
 
 
 }
