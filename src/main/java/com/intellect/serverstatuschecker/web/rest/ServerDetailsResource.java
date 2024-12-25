@@ -130,6 +130,7 @@ public class ServerDetailsResource {
 		}
 		return ServerDetailsResponseUtil.buildResponse(ApplicationConstants.RES_STATUS_SUCCESS,
 				ApplicationConstants.SERVER_DETAILS + ApplicationConstants.DELETED_SUCCESSFULLY, result);
-
 	}
+	
+   
 }
