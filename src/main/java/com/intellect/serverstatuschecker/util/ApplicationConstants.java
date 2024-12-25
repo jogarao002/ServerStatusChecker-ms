@@ -66,4 +66,6 @@ public class ApplicationConstants {
 	public static final String REGISTER_FAILED = prop.getProperty("REGISTER_FAILED");
 	
 	public static final String DELETED_SUCCESSFULLY = prop.getProperty("DELETED_SUCCESSFULLY");
+	
+	public static final String USER_EMAIL_IS_ALREADY_EXISTED = prop.getProperty("USER_EMAIL_IS_ALREADY_EXISTED");
 }

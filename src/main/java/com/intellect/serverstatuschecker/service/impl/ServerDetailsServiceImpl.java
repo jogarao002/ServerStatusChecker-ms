@@ -123,7 +123,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-	@Scheduled(cron = "0 0/1 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
@@ -249,13 +249,26 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	}
 
 	@Override
-	public UsersDTO register(UsersDTO usersDTO) {
+	public UsersDTO register(UsersDTO usersDTO) throws ServerDetailsBusinessException {
 		if(null != usersDTO) {
+			duplicateCheckForExistingUser(usersDTO);
 			Users users = usersMapper.toEntity(usersDTO);
 			users.setPassword(bCryptPasswordEncoder.encode(users.getPassword()));
 			userRepository.save(users);
 		}
 		return usersDTO;
+	}
+
+	private void duplicateCheckForExistingUser(UsersDTO usersDTO) throws ServerDetailsBusinessException {
+		Users users = userRepository.findByEmail(usersDTO.getEmail());
+
+		if (null != users && null != users.getEmail()) {
+			if (users.getEmail().equals(usersDTO.getEmail())) {
+				String errorMessage = String.format(ApplicationConstants.USER_EMAIL_IS_ALREADY_EXISTED,
+						usersDTO.getEmail());
+				throw new ServerDetailsBusinessException(errorMessage);
+			}
+		}
 	}
 
 	@Override
