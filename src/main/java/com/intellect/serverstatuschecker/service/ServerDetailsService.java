@@ -29,4 +29,6 @@ public interface ServerDetailsService {
 	List<ServerMonitorDetailsDTO> delete(Long id) throws ServerDetailsBusinessException;
 
 	
+
+	
 }
