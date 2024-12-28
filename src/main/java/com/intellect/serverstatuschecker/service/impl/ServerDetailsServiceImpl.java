@@ -9,10 +9,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,13 +20,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.intellect.serverstatuschecker.domain.MailDetails;
 import com.intellect.serverstatuschecker.domain.ServerDetails;
+import com.intellect.serverstatuschecker.domain.ServerHistoryDetails;
 import com.intellect.serverstatuschecker.domain.ServerMonitorDetails;
 import com.intellect.serverstatuschecker.domain.Users;
 import com.intellect.serverstatuschecker.exception.ServerDetailsBusinessException;
-import com.intellect.serverstatuschecker.repository.MailDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerDetailsRepository;
+import com.intellect.serverstatuschecker.repository.ServerHistoryDetailsRepository;
 import com.intellect.serverstatuschecker.repository.ServerMonitorDetailsRepository;
 import com.intellect.serverstatuschecker.repository.UserRepository;
 import com.intellect.serverstatuschecker.service.ServerDetailsService;
@@ -41,7 +40,8 @@ import com.intellect.serverstatuschecker.service.mapper.ServerMonitorDetailsMapp
 import com.intellect.serverstatuschecker.service.mapper.UsersMapper;
 import com.intellect.serverstatuschecker.util.ApplicationConstants;
 import com.intellect.serverstatuschecker.util.EmailUtils;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import jakarta.mail.MessagingException;
 
 @Service
@@ -54,14 +54,12 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	@Autowired
 	private ServerMonitorDetailsMapper serverMonitorDetailsMapper;
 
-	@Autowired
-	private MailDetailsRepository mailDetailsRepository;
 
 	@Autowired
 	private ServerMonitorDetailsRepository serverMonitorDetailsRepository;
 
 	@Autowired
-	private EmailUtils emailUtils;
+	private  EmailUtils emailUtils;
 	
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -80,6 +78,14 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	
 	@Autowired
 	private JWTServiceImpl jwtServiceImpl;
+	
+	@Autowired
+	private ServerHistoryDetailsRepository serverHistoryDetailsRepository;
+	
+	@Autowired
+	private  Environment env;
+	
+	private static final Logger logger = LoggerFactory.getLogger(ServerDetailsServiceImpl.class);
 
 	@Override
 	public ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
@@ -119,14 +125,19 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		return serverMonitorDetailsDTOList;
 	}
 
-	//@Scheduled(cron = "0 0/1 * * * ?")
+//	@Scheduled(cron = "0 0/1 * * * ?")
 	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
+		logger.info("Server status monitor job started.");
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
+			logger.info("Found {} active servers to monitor.", serverDetailsList.size());
 			for (ServerDetails serverDetails : serverDetailsList) {
+				logger.debug("Checking server status for IP: {} and Port: {}", serverDetails.getServerIpAddress(), serverDetails.getServerPort());
 				findServerStatus(serverDetails);
 			}
-		}
+		}else {
+	        logger.info("No active servers found for monitoring.");
+	    }
 		List<ServerMonitorDetails> serverMonitorDetailsList = serverMonitorDetailsRepository
 				.findByServerStatus(ApplicationConstants.FALSE);
 		// This list for vinod (If the inactive count is less than 3)
@@ -142,37 +153,40 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 					secondPriorityServerMonitorDetails.add(serverMonitorDetails);
 			}
 		}
+		
+		logger.info("First priority server monitor details count: {}", firstPriorityServerMonitorDetails.size());
+	    logger.info("Second priority server monitor details count: {}", secondPriorityServerMonitorDetails.size());
 
 		if (null != firstPriorityServerMonitorDetails && !firstPriorityServerMonitorDetails.isEmpty()) {
-			Integer inactiveCount = firstPriorityServerMonitorDetails.get(1).getInactiveCount();
-			List<String> firstPriorityMailId = new ArrayList<>();
-			List<String> firstPriorityPersonName = new ArrayList<>();
-			if (inactiveCount < 3) {
-				MailDetails mailDetails = mailDetailsRepository.findByPersonPriorityAndStatus(ApplicationConstants.ONE,
-						ApplicationConstants.TRUE);
-				if (null != mailDetails && null != mailDetails.getPersonMailAddress()) {
-					firstPriorityMailId.add(mailDetails.getPersonMailAddress());
-					firstPriorityPersonName.add(mailDetails.getPersonName()); 
-				}
+			Integer inactiveCount = firstPriorityServerMonitorDetails.get(0).getInactiveCount();	
+			List<String> firstPriorityToMailId = new ArrayList<>();
+			List<String> firstPriorityCCMailId = new ArrayList<>();
+			firstPriorityToMailId.add("saikumar.kotturu@intellectinfo.com");
+			firstPriorityCCMailId.add("mokshasri.venkatesh@intellectinfo.com");
+			if(inactiveCount < 3) {
+				logger.info("Sending email for first priority servers (inactive count < 3).");
+				sendsMail(firstPriorityServerMonitorDetails,firstPriorityToMailId,firstPriorityCCMailId);
 			}
-			if (!firstPriorityMailId.isEmpty()) {
-				sendEmail(firstPriorityServerMonitorDetails, firstPriorityMailId, firstPriorityPersonName);
+			
+		}else {
+	        logger.info("No first priority servers to send email for.");
+	    }
+		if (null != secondPriorityServerMonitorDetails && !secondPriorityServerMonitorDetails.isEmpty()) {
+			Integer inactiveCount = secondPriorityServerMonitorDetails.get(0).getInactiveCount();		
+			List<String> secondPriorityToMailId = new ArrayList<>();
+			List<String> secondPriorityCCMailId = new ArrayList<>();
+			secondPriorityToMailId.add("jogarao.bagadi@intellectinfo.com");
+			secondPriorityCCMailId.add("saikumar.kotturu@intellectinfo.com");
+			secondPriorityCCMailId.add("mokshasri.venkatesh@intellectinfo.com");
+			if(inactiveCount >= 3) {
+				logger.info("Sending email for second priority servers (inactive count >= 3).");
+				sendsMail(secondPriorityServerMonitorDetails,secondPriorityToMailId,secondPriorityCCMailId);
 			}
-		} else if (null != secondPriorityServerMonitorDetails && !secondPriorityServerMonitorDetails.isEmpty()) {
-			Integer inactiveCount = secondPriorityServerMonitorDetails.get(1).getInactiveCount();
-			List<String> secondPriorityMailIds = new ArrayList<>();
-			List<String> secondPriorityPersonNames = new ArrayList<>();
-			if (inactiveCount >= 3) {
-				List<MailDetails> mailDetailsList = mailDetailsRepository.findByStatus(ApplicationConstants.TRUE);
-				secondPriorityMailIds = mailDetailsList.stream().map(MailDetails::getPersonMailAddress)
-						.collect(Collectors.toList());
-				secondPriorityPersonNames = mailDetailsList.stream().map(MailDetails::getPersonName)
-						.collect(Collectors.toList());
-			}
-			if (!secondPriorityMailIds.isEmpty()) {
-				sendEmail(secondPriorityServerMonitorDetails, secondPriorityMailIds, secondPriorityPersonNames);
-			}
-		}
+		}else {
+	        logger.info("No second priority servers to send email for.");
+	    }
+
+	    logger.info("Server status monitor job completed.");
 	}
 
 	private void findServerStatus(ServerDetails serverDetails) throws ServerDetailsBusinessException {
@@ -218,7 +232,20 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 					serverMonitorDetails.setInactiveCount(1);
 				}
 			}
-			serverMonitorDetailsRepository.save(serverMonitorDetails);
+			ServerMonitorDetails monitor = serverMonitorDetailsRepository.save(serverMonitorDetails);
+			ServerHistoryDetails history = new ServerHistoryDetails();
+			history.setHostName(monitor.getHostName());
+			history.setServerProtocolType(monitor.getServerProtocolType());
+			history.setServerIpAddress(monitor.getServerIpAddress());
+			history.setServerPort(monitor.getServerPort());
+			history.setServiceName(monitor.getServiceName());
+			history.setServerDate(monitor.getServerDate());
+			history.setServerTime(monitor.getServerTime());
+			history.setServerStatus(monitor.getServerStatus());
+			history.setServerStatusName(monitor.getServerStatusName());
+			
+			serverHistoryDetailsRepository.save(history);
+			
 		}
 	}
 
@@ -230,66 +257,6 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 			return false; // If there's any exception, the server is not reachable
 		}
 	}
-
-	private Boolean sendEmail(List<ServerMonitorDetails> serverMonitorDetailsList, List<String> mailIdsList,
-			List<String> priorityPersonNames) throws MessagingException {
-		// Trim all email addresses, remove spaces, and filter out invalid emails
-		List<String> validEmails = mailIdsList.stream().map(String::trim) // Remove leading/trailing whitespace
-				.filter(this::isValidEmail) // Filter out invalid email formats
-				.collect(Collectors.toList());
-
-		if (validEmails.isEmpty()) {
-			System.out.println("No valid email addresses found.");
-			return false;
-		}
-
-		// Convert the list of valid emails to an array
-		String[] to = validEmails.toArray(new String[0]);
-
-		// Log the result of the email list
-		System.out.println("Email list to send to: " + String.join(", ", to));
-
-		String subject = ApplicationConstants.THESE_SERVERS_DOWN;
-		StringBuilder body = new StringBuilder();
-		body.append("<h2>Hi ").append(priorityPersonNames).append("</h2>");
-		body.append("<br>");
-		body.append("<h3>Below servers are down, please look at once.</h3>");
-		body.append("<br>");
-		body.append("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse;'>");
-		body.append("<thead>");
-		body.append("<tr>");
-		body.append("<th> host Name</th>");
-		body.append("<th>Service Name</th>");
-		body.append("<th>Server Ip Address</th>");
-		body.append("<th>Server Port</th>");
-		body.append("<th>Server Status</th>");
-		body.append("</tr>");
-		body.append("</thead>");
-		body.append("<tbody>");
-		for (ServerMonitorDetails server : serverMonitorDetailsList) {
-			body.append("<tr>");
-			body.append("<td>").append(server.getHostName()).append("</td>");
-			body.append("<td>").append(server.getServiceName()).append("</td>");
-			body.append("<td>").append(server.getServerIpAddress()).append("</td>");
-			body.append("<td>").append(server.getServerPort()).append("</td>");
-			body.append("<td>").append(server.getServerStatusName()).append("</td>");
-			body.append("</tr>");
-		}
-		body.append("</tbody>");
-		body.append("</table>");
-		body.append("<br>");
-		body.append("<p>Kind regards,<br>Your Automated Monitoring System</p>");
-
-		// Send email with properly formatted email addresses as an array
-		boolean sendEmail = emailUtils.sendEmail(to, subject, body.toString());
-		if (sendEmail) {
-			System.out.println("Mail sent successfully to: " + String.join(", ", to));
-		} else {
-			System.out.println("Mail not sent.");
-		}
-		return true;
-	}
-
 	private boolean isValidEmail(String email) {
 		// Regular expression to validate the email format properly
 		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
@@ -301,13 +268,26 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	}
 
 	@Override
-	public UsersDTO register(UsersDTO usersDTO) {
+	public UsersDTO register(UsersDTO usersDTO) throws ServerDetailsBusinessException {
 		if(null != usersDTO) {
+			duplicateCheckForExistingUser(usersDTO);
 			Users users = usersMapper.toEntity(usersDTO);
 			users.setPassword(bCryptPasswordEncoder.encode(users.getPassword()));
 			userRepository.save(users);
 		}
 		return usersDTO;
+	}
+
+	private void duplicateCheckForExistingUser(UsersDTO usersDTO) throws ServerDetailsBusinessException {
+		Users users = userRepository.findByEmail(usersDTO.getEmail());
+
+		if (null != users && null != users.getEmail()) {
+			if (users.getEmail().equals(usersDTO.getEmail())) {
+				String errorMessage = String.format(ApplicationConstants.USER_EMAIL_IS_ALREADY_EXISTED,
+						usersDTO.getEmail());
+				throw new ServerDetailsBusinessException(errorMessage);
+			}
+		}
 	}
 
 	@Override
@@ -325,7 +305,7 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	            LogInDataDTO logInDataDTO = new LogInDataDTO();
 	            logInDataDTO.setUserName(loginDTO.getLoginUserName());
 	            logInDataDTO.setToken(token);
-	            Users user = userRepository.findByUserName(loginDTO.getLoginUserName());
+	            Users user = userRepository.findByEmail(loginDTO.getLoginUserName());
 	            logInDataDTO.setUserRole(user.getUserRole());
 	            String expirationToken = jwtServiceImpl.generateExpirationToken();
 	            logInDataDTO.setExpirationToken(expirationToken);
@@ -364,6 +344,25 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	    return serverMonitorDetailsDTOList;
 	}
 
-
+	//@Scheduled(cron = "59 23 28 1-12 *")
+	public void deleteHistoryDetails() {
+	    logger.info("Deleting server history details job started.");
+	    try {
+	        serverHistoryDetailsRepository.deleteAll();
+	        logger.info("All server history details deleted successfully.");
+	    } catch (Exception e) {
+	        logger.error("Error occurred while deleting server history details.", e);
+	    }
+	    
+	    logger.info("Delete server history details job completed.");
+		
+	}
+	
+	public  void sendsMail(List<ServerMonitorDetails> serverMonitorDetailsList,List<String>toMails,List<String>ccMails) {	
+		String fromEmail = "admin@intellectinfo.com";
+		 emailUtils.sendServerStatusListMail(serverMonitorDetailsList,ccMails, fromEmail, toMails,  env);
+		System.out.println("mail sent sucess");
+		
+	}
 
 }
