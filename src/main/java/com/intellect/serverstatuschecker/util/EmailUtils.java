@@ -3,16 +3,11 @@ package com.intellect.serverstatuschecker.util;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 import com.intellect.serverstatuschecker.domain.ServerMonitorDetails;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -22,24 +17,24 @@ import okhttp3.Response;
 @Component
 public class EmailUtils {
 
-	@Autowired
-	private JavaMailSender javaMailSender;
-
-	public boolean sendEmail(String[] to, String subject, String body) throws MessagingException {
-		
-		try {
-	        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-	        helper.setTo(to);
-	        helper.setSubject(subject);
-	        helper.setText(body, true);
-	        javaMailSender.send(mimeMessage);
-	        return true;
-	    } catch (MessagingException e) {
-	        e.printStackTrace(); 
-	    }
-		return false;
-	}
+//	@Autowired
+//	private JavaMailSender javaMailSender;
+//
+//	public boolean sendEmail(String[] to, String subject, String body) throws MessagingException {
+//		
+//		try {
+//	        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+//	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+//	        helper.setTo(to);
+//	        helper.setSubject(subject);
+//	        helper.setText(body, true);
+//	        javaMailSender.send(mimeMessage);
+//	        return true;
+//	    } catch (MessagingException e) {
+//	        e.printStackTrace(); 
+//	    }
+//		return false;
+//	}
 	private static void sendInBlueInitialization(String bodyemails, Environment env) {
 		String url = env.getProperty("user.credentialurl");
 		String apikey = env.getProperty("user.credentialApi");

@@ -14,8 +14,12 @@ import com.intellect.serverstatuschecker.util.ApplicationConstants;
 
 @Service
 public class MyUserDetails implements UserDetailsService {
+	
+    public MyUserDetails() {
+		super();
+	}
 
-    @Autowired
+	@Autowired
     private UserRepository userRepository;
 
     @Override

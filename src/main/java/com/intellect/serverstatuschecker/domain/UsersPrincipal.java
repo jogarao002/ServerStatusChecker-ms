@@ -7,7 +7,9 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UsersPrincipal implements UserDetails {
 	
 	/**
@@ -16,6 +18,10 @@ public class UsersPrincipal implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	
 	private Users users;
+	
+	public UsersPrincipal() {
+		super();
+	}
 
 	public UsersPrincipal(Users users) {
 		this.users = users;

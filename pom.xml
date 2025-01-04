@@ -10,13 +10,14 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.intellect.serverStatusChecker</groupId>
-	<artifactId>serverStatusChecker</artifactId>
+	<artifactId>serverstatuschecker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>serverStatusChecker</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
+		<start-class>com.intellect.serverstatuschecker.ServerstatuscheckerApp</start-class>
 	</properties>
 
 	<repositories>
@@ -34,10 +35,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
@@ -48,13 +45,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
 			<scope>provided</scope>
-		</dependency>
-	
-		<!--logging-->
-		<dependency>
-			<groupId>org.codehaus.janino</groupId>
-			<artifactId>janino</artifactId>
-			<version>3.1.6</version> <!-- Use the latest version available -->
 		</dependency>
 
 		<!-- Database -->
@@ -97,13 +87,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Hibernate Validator -->
-		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>8.0.1.Final</version>
-		</dependency>
-
 		<!-- Spring Boot Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -119,13 +102,18 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
 		</dependency>
-
+		<!--To resolve jakarta.servlet.ServletException: Failed to instantiate WebApplicationInitializer class-->
+		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

@@ -10,15 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.intellect.serverstatuschecker.domain.ServerDetails;
 import com.intellect.serverstatuschecker.domain.ServerHistoryDetails;
@@ -40,12 +42,8 @@ import com.intellect.serverstatuschecker.service.mapper.ServerMonitorDetailsMapp
 import com.intellect.serverstatuschecker.service.mapper.UsersMapper;
 import com.intellect.serverstatuschecker.util.ApplicationConstants;
 import com.intellect.serverstatuschecker.util.EmailUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import jakarta.mail.MessagingException;
 
 @Service
-@Transactional
 public class ServerDetailsServiceImpl implements ServerDetailsService {
 
 	@Autowired
@@ -54,46 +52,45 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 	@Autowired
 	private ServerMonitorDetailsMapper serverMonitorDetailsMapper;
 
-
 	@Autowired
 	private ServerMonitorDetailsRepository serverMonitorDetailsRepository;
 
 	@Autowired
-	private  EmailUtils emailUtils;
-	
+	private EmailUtils emailUtils;
+
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
+
 	@Autowired
 	private UsersMapper usersMapper;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private ServerDetailsMapper serverDetailsMapper;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private JWTServiceImpl jwtServiceImpl;
-	
+
 	@Autowired
 	private ServerHistoryDetailsRepository serverHistoryDetailsRepository;
-	
+
 	@Autowired
-	private  Environment env;
-	
+	private Environment env;
+
 	private static final Logger logger = LoggerFactory.getLogger(ServerDetailsServiceImpl.class);
 
 	@Override
 	public ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO) throws ServerDetailsBusinessException {
-		if(null != serverDetailsDTO) {
+		if (null != serverDetailsDTO) {
 			duplicateCheck(serverDetailsDTO);
-			if(null != serverDetailsDTO.getId()) {
+			if (null != serverDetailsDTO.getId()) {
 				Optional<ServerDetails> optServerDetails = serverDetailsRepository.findById(serverDetailsDTO.getId());
-				if(optServerDetails.isPresent()) {
+				if (optServerDetails.isPresent()) {
 					ServerDetails serverDetails = optServerDetails.get();
 					serverDetailsDTO.setServerIpAddress(serverDetails.getServerIpAddress());
 					serverDetailsDTO.setServerPort(serverDetails.getServerPort());
@@ -118,26 +115,27 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 		}
 	}
 
-
 	@Override
 	public List<ServerMonitorDetailsDTO> findAll() throws ServerDetailsBusinessException {
-		List<ServerMonitorDetailsDTO> serverMonitorDetailsDTOList = serverMonitorDetailsMapper.toDto(serverMonitorDetailsRepository.findAll());
+		List<ServerMonitorDetailsDTO> serverMonitorDetailsDTOList = serverMonitorDetailsMapper
+				.toDto(serverMonitorDetailsRepository.findAll());
 		return serverMonitorDetailsDTOList;
 	}
 
-//	@Scheduled(cron = "0 0/1 * * * ?")
-	public void serverStatusMonitor() throws ServerDetailsBusinessException, MessagingException {
+	@Scheduled(cron = "0 0/15 * * * ?")
+	public void serverStatusMonitor() throws ServerDetailsBusinessException {
 		logger.info("Server status monitor job started.");
 		List<ServerDetails> serverDetailsList = serverDetailsRepository.findByServerStatus(ApplicationConstants.TRUE);
 		if (null != serverDetailsList && !serverDetailsList.isEmpty()) {
 			logger.info("Found {} active servers to monitor.", serverDetailsList.size());
 			for (ServerDetails serverDetails : serverDetailsList) {
-				logger.debug("Checking server status for IP: {} and Port: {}", serverDetails.getServerIpAddress(), serverDetails.getServerPort());
+				logger.debug("Checking server status for IP: {} and Port: {}", serverDetails.getServerIpAddress(),
+						serverDetails.getServerPort());
 				findServerStatus(serverDetails);
 			}
-		}else {
-	        logger.info("No active servers found for monitoring.");
-	    }
+		} else {
+			logger.info("No active servers found for monitoring.");
+		}
 		List<ServerMonitorDetails> serverMonitorDetailsList = serverMonitorDetailsRepository
 				.findByServerStatus(ApplicationConstants.FALSE);
 		// This list for vinod (If the inactive count is less than 3)
@@ -153,40 +151,40 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 					secondPriorityServerMonitorDetails.add(serverMonitorDetails);
 			}
 		}
-		
+
 		logger.info("First priority server monitor details count: {}", firstPriorityServerMonitorDetails.size());
-	    logger.info("Second priority server monitor details count: {}", secondPriorityServerMonitorDetails.size());
+		logger.info("Second priority server monitor details count: {}", secondPriorityServerMonitorDetails.size());
 
 		if (null != firstPriorityServerMonitorDetails && !firstPriorityServerMonitorDetails.isEmpty()) {
-			Integer inactiveCount = firstPriorityServerMonitorDetails.get(0).getInactiveCount();	
+			Integer inactiveCount = firstPriorityServerMonitorDetails.get(0).getInactiveCount();
 			List<String> firstPriorityToMailId = new ArrayList<>();
 			List<String> firstPriorityCCMailId = new ArrayList<>();
-			firstPriorityToMailId.add("saikumar.kotturu@intellectinfo.com");
+			firstPriorityToMailId.add("vinod.ogirala@intellectinfo.com");
 			firstPriorityCCMailId.add("mokshasri.venkatesh@intellectinfo.com");
-			if(inactiveCount < 3) {
+			if (inactiveCount < 3) {
 				logger.info("Sending email for first priority servers (inactive count < 3).");
-				sendsMail(firstPriorityServerMonitorDetails,firstPriorityToMailId,firstPriorityCCMailId);
+				sendsMail(firstPriorityServerMonitorDetails, firstPriorityToMailId, firstPriorityCCMailId);
 			}
-			
-		}else {
-	        logger.info("No first priority servers to send email for.");
-	    }
+
+		} else {
+			logger.info("No first priority servers to send email for.");
+		}
 		if (null != secondPriorityServerMonitorDetails && !secondPriorityServerMonitorDetails.isEmpty()) {
-			Integer inactiveCount = secondPriorityServerMonitorDetails.get(0).getInactiveCount();		
+			Integer inactiveCount = secondPriorityServerMonitorDetails.get(0).getInactiveCount();
 			List<String> secondPriorityToMailId = new ArrayList<>();
 			List<String> secondPriorityCCMailId = new ArrayList<>();
-			secondPriorityToMailId.add("jogarao.bagadi@intellectinfo.com");
-			secondPriorityCCMailId.add("saikumar.kotturu@intellectinfo.com");
+			secondPriorityToMailId.add("bala@intellectinfo.com");
+			secondPriorityCCMailId.add("vinod.ogirala@intellectinfo.com");
 			secondPriorityCCMailId.add("mokshasri.venkatesh@intellectinfo.com");
-			if(inactiveCount >= 3) {
+			if (inactiveCount >= 3) {
 				logger.info("Sending email for second priority servers (inactive count >= 3).");
-				sendsMail(secondPriorityServerMonitorDetails,secondPriorityToMailId,secondPriorityCCMailId);
+				sendsMail(secondPriorityServerMonitorDetails, secondPriorityToMailId, secondPriorityCCMailId);
 			}
-		}else {
-	        logger.info("No second priority servers to send email for.");
-	    }
+		} else {
+			logger.info("No second priority servers to send email for.");
+		}
 
-	    logger.info("Server status monitor job completed.");
+		logger.info("Server status monitor job completed.");
 	}
 
 	private void findServerStatus(ServerDetails serverDetails) throws ServerDetailsBusinessException {
@@ -243,9 +241,9 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 			history.setServerTime(monitor.getServerTime());
 			history.setServerStatus(monitor.getServerStatus());
 			history.setServerStatusName(monitor.getServerStatusName());
-			
+
 			serverHistoryDetailsRepository.save(history);
-			
+
 		}
 	}
 
@@ -257,19 +255,10 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 			return false; // If there's any exception, the server is not reachable
 		}
 	}
-	private boolean isValidEmail(String email) {
-		// Regular expression to validate the email format properly
-		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-		if (email == null || !email.matches(emailRegex)) {
-			System.out.println("Invalid email: " + email); // Optional: log invalid email
-			return false;
-		}
-		return true;
-	}
 
 	@Override
 	public UsersDTO register(UsersDTO usersDTO) throws ServerDetailsBusinessException {
-		if(null != usersDTO) {
+		if (null != usersDTO) {
 			duplicateCheckForExistingUser(usersDTO);
 			Users users = usersMapper.toEntity(usersDTO);
 			users.setPassword(bCryptPasswordEncoder.encode(users.getPassword()));
@@ -292,77 +281,74 @@ public class ServerDetailsServiceImpl implements ServerDetailsService {
 
 	@Override
 	public LogInDataDTO login(LoginDTO loginDTO) throws ServerDetailsBusinessException {
-	    try {
-	        // Authenticate the user
-	        Authentication authentication = authenticationManager.authenticate(
-	            new UsernamePasswordAuthenticationToken(loginDTO.getLoginUserName(), loginDTO.getLoginPassword())
-	        );
+		try {
+			// Authenticate the user
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginDTO.getLoginUserName(), loginDTO.getLoginPassword()));
 
-	        // If authentication is successful
-	        if (authentication.isAuthenticated()) {
-	            // After successful authentication, you may want to create a token
-	            String token = jwtServiceImpl.generateToken(loginDTO.getLoginUserName());  
-	            LogInDataDTO logInDataDTO = new LogInDataDTO();
-	            logInDataDTO.setUserName(loginDTO.getLoginUserName());
-	            logInDataDTO.setToken(token);
-	            Users user = userRepository.findByEmail(loginDTO.getLoginUserName());
-	            logInDataDTO.setUserRole(user.getUserRole());
-	            String expirationToken = jwtServiceImpl.generateExpirationToken();
-	            logInDataDTO.setExpirationToken(expirationToken);
-	            
-	            return logInDataDTO;
-	        } else {
-	            throw new ServerDetailsBusinessException(ApplicationConstants.AUTHENTICATION_FAILED);
-	        }
+			// If authentication is successful
+			if (authentication.isAuthenticated()) {
+				// After successful authentication, you may want to create a token
+				String token = jwtServiceImpl.generateToken(loginDTO.getLoginUserName());
+				LogInDataDTO logInDataDTO = new LogInDataDTO();
+				logInDataDTO.setUserName(loginDTO.getLoginUserName());
+				logInDataDTO.setToken(token);
+				Users user = userRepository.findByEmail(loginDTO.getLoginUserName());
+				logInDataDTO.setUserRole(user.getUserRole());
+				String expirationToken = jwtServiceImpl.generateExpirationToken();
+				logInDataDTO.setExpirationToken(expirationToken);
 
-	    } catch (BadCredentialsException e) {
-	        // Handle incorrect credentials
-	        throw new ServerDetailsBusinessException(ApplicationConstants.INVAILD_USERNAME_OR_PASSWORD);
-	    } catch (Exception e) {
-	        // Handle other unexpected errors
-	        throw new ServerDetailsBusinessException(ApplicationConstants.AN_ERROR_OCCURED_DURING_AUTHENTICATION);
-	    }
+				return logInDataDTO;
+			} else {
+				throw new ServerDetailsBusinessException(ApplicationConstants.AUTHENTICATION_FAILED);
+			}
+
+		} catch (BadCredentialsException e) {
+			// Handle incorrect credentials
+			throw new ServerDetailsBusinessException(ApplicationConstants.INVAILD_USERNAME_OR_PASSWORD);
+		} catch (Exception e) {
+			// Handle other unexpected errors
+			throw new ServerDetailsBusinessException(ApplicationConstants.AN_ERROR_OCCURED_DURING_AUTHENTICATION);
+		}
 	}
-	
+
 	@Override
 	public List<ServerMonitorDetailsDTO> delete(Long id) throws ServerDetailsBusinessException {
-	    List<ServerMonitorDetailsDTO> serverMonitorDetailsDTOList = new ArrayList<>();
-	    if (id != null) {
-	        Optional<ServerDetails> optServerDetails = serverDetailsRepository.findById(id);
-	        if (optServerDetails.isPresent()) {
-	            ServerDetails serverDetails = optServerDetails.get();
-	            serverDetails.setServerStatus(ApplicationConstants.FALSE);
-	            serverDetailsRepository.save(serverDetails);
-	        }
-	        Optional<ServerMonitorDetails> optServerMonitorDetails = serverMonitorDetailsRepository.findById(id);
-	        if(optServerMonitorDetails.isPresent()) {
-	        	ServerMonitorDetails serverMonitorDetails = optServerMonitorDetails.get();
-	        	serverMonitorDetailsRepository.delete(serverMonitorDetails);
-	        }
-	        serverMonitorDetailsDTOList = findAll();
-	    }
-	    return serverMonitorDetailsDTOList;
+		List<ServerMonitorDetailsDTO> serverMonitorDetailsDTOList = new ArrayList<>();
+		if (id != null) {
+			Optional<ServerDetails> optServerDetails = serverDetailsRepository.findById(id);
+			if (optServerDetails.isPresent()) {
+				ServerDetails serverDetails = optServerDetails.get();
+				serverDetails.setServerStatus(ApplicationConstants.FALSE);
+				serverDetailsRepository.save(serverDetails);
+			}
+			Optional<ServerMonitorDetails> optServerMonitorDetails = serverMonitorDetailsRepository.findById(id);
+			if (optServerMonitorDetails.isPresent()) {
+				ServerMonitorDetails serverMonitorDetails = optServerMonitorDetails.get();
+				serverMonitorDetailsRepository.delete(serverMonitorDetails);
+			}
+			serverMonitorDetailsDTOList = findAll();
+		}
+		return serverMonitorDetailsDTOList;
 	}
 
-	//@Scheduled(cron = "59 23 28 1-12 *")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void deleteHistoryDetails() {
-	    logger.info("Deleting server history details job started.");
-	    try {
-	        serverHistoryDetailsRepository.deleteAll();
-	        logger.info("All server history details deleted successfully.");
-	    } catch (Exception e) {
-	        logger.error("Error occurred while deleting server history details.", e);
-	    }
-	    
-	    logger.info("Delete server history details job completed.");
-		
+		logger.info("Deleting server history details job started.");
+		try {
+			serverHistoryDetailsRepository.deleteAll();
+			logger.info("All server history details deleted successfully.");
+		} catch (Exception e) {
+			logger.error("Error occurred while deleting server history details.", e);
+		}
+		logger.info("Delete server history details job completed.");
 	}
-	
-	public  void sendsMail(List<ServerMonitorDetails> serverMonitorDetailsList,List<String>toMails,List<String>ccMails) {	
+
+	public void sendsMail(List<ServerMonitorDetails> serverMonitorDetailsList, List<String> toMails,
+			List<String> ccMails) {
 		String fromEmail = "admin@intellectinfo.com";
-		 emailUtils.sendServerStatusListMail(serverMonitorDetailsList,ccMails, fromEmail, toMails,  env);
+		emailUtils.sendServerStatusListMail(serverMonitorDetailsList, ccMails, fromEmail, toMails, env);
 		System.out.println("mail sent sucess");
-		
 	}
 
 }

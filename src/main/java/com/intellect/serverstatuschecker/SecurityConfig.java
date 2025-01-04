@@ -18,6 +18,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	public SecurityConfig() {
+		super();
+	}
 
 	@Autowired
 	private UserDetailsService userDetailsService; // Load user details from the database

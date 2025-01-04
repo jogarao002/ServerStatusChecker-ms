@@ -7,10 +7,13 @@ import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -24,15 +27,26 @@ import jakarta.annotation.PostConstruct;
 @SpringBootApplication
 @EnableConfigurationProperties({ LiquibaseProperties.class})
 @EnableScheduling 
-public class ServerstatuscheckerApp {
+public class ServerstatuscheckerApp extends SpringBootServletInitializer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerstatuscheckerApp.class);
 
-    private final Environment env;
+    
+    public ServerstatuscheckerApp() {
+		super();
+	}
+    
+    @Autowired
+    private Environment env;
+    
 
-    public ServerstatuscheckerApp(Environment env) {
-        this.env = env;
-    }
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		// TODO Auto-generated method stub
+		return builder.sources(ServerstatuscheckerApp.class);
+	}
+
+
 
 	/**
 	 * Inits the application.

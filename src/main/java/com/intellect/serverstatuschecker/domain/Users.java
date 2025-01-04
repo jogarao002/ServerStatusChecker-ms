@@ -14,6 +14,10 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Users implements Serializable{
+	
+	public Users() {
+		super();
+	}
 
 	/**
 	 * 

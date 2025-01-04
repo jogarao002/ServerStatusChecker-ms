@@ -26,7 +26,7 @@ import com.intellect.serverstatuschecker.util.ServerDetailsResponseUtil;
 
 @RestController
 @RequestMapping("/server_details")
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "http://192.168.1.204:22", allowedHeaders = "*", allowCredentials = "true")
 public class ServerDetailsResource {
 	
 	@Autowired

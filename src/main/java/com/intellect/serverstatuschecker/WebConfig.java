@@ -13,16 +13,15 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("http://localhost:4200", "http://localhost:9010") // Frontend and
-																									// Swagger UI
+		registry.addMapping("/**").allowedOrigins("http://192.168.1.204:22") // Frontend and
 				.allowedMethods("*").allowedHeaders("*").allowCredentials(true);
 	}
 
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.addAllowedOrigin("http://localhost:4200"); // Angular frontend
-		configuration.addAllowedOrigin("http://localhost:9010"); // Swagger UI
+		configuration.addAllowedOrigin("http://192.168.1.204:22"); // Angular frontend
+//		configuration.addAllowedOrigin("http://localhost:9010");
 		configuration.addAllowedMethod("*");
 		configuration.addAllowedHeader("*");
 		configuration.setAllowCredentials(true);

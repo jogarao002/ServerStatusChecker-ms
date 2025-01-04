@@ -9,7 +9,6 @@ import com.intellect.serverstatuschecker.service.dto.ServerDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.ServerMonitorDetailsDTO;
 import com.intellect.serverstatuschecker.service.dto.UsersDTO;
 
-import jakarta.mail.MessagingException;
 
 /**
  * Service Interface for managing
@@ -20,7 +19,7 @@ public interface ServerDetailsService {
 	
 	ServerDetailsDTO save(ServerDetailsDTO serverDetailsDTO)throws ServerDetailsBusinessException;
 	
-	List<ServerMonitorDetailsDTO> findAll() throws ServerDetailsBusinessException, MessagingException;
+	List<ServerMonitorDetailsDTO> findAll() throws ServerDetailsBusinessException;
 
 	UsersDTO register(UsersDTO userDTO) throws ServerDetailsBusinessException;
 

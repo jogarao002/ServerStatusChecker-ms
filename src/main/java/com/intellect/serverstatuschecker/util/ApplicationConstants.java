@@ -15,6 +15,19 @@ public class ApplicationConstants {
 		}
 	}
 	
+	static Properties properties = new Properties();
+
+	static {
+	    try {
+	        properties.load(ServerstatuscheckerApp.class.getClassLoader()
+	            .getResourceAsStream("config/application-" + "dev" + ".properties"));
+	            
+//	                    .getResourceAsStream("config/application-"
+//	                            + System.getProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME) + ".properties"));
+	        } catch (IOException ex) {
+	        }
+	    }
+	
 	public static final String RES_STATUS_ERROR = prop.getProperty("RES_STATUS_ERROR");
 	
 	public static final String BAD_REQUEST = prop.getProperty("BAD_REQUEST");

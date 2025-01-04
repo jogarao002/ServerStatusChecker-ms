@@ -22,6 +22,10 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 	
+	public JwtFilter() {
+		super();
+	}
+
 	@Autowired
 	private JWTServiceImpl jwtServiceImpl;
 	
